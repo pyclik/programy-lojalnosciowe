@@ -71,6 +71,13 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -86,13 +93,13 @@
             <p class="text-lg text-slate-400 mt-4 max-w-3xl mx-auto">Interaktywny raport wspierający wybór optymalnej strategii dla podróży służbowych z Polski.</p>
         </header>
 
-        <nav class="sticky top-4 bg-slate-800/60 backdrop-blur-xl border border-slate-700 shadow-lg shadow-black/20 rounded-full z-10 mb-16 p-2 max-w-xl mx-auto">
-            <ul class="flex justify-center items-center space-x-1">
-                <li><a href="#gemini-strategy" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-4 py-2 rounded-full transition-all">✨ Twoja Strategia</a></li>
-                <li><a href="#summary" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-4 py-2 rounded-full transition-all">Rekomendacje</a></li>
-                <li><a href="#comparison" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-4 py-2 rounded-full transition-all">Porównanie</a></li>
-                <li><a href="#analysis" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-4 py-2 rounded-full transition-all">Analiza</a></li>
-                <li><a href="#tips" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-4 py-2 rounded-full transition-all">Wskazówki</a></li>
+        <nav class="sticky top-4 bg-slate-800/60 backdrop-blur-xl border border-slate-700 shadow-lg shadow-black/20 rounded-full z-10 mb-16 p-2 max-w-full lg:max-w-xl mx-auto">
+            <ul class="flex justify-start sm:justify-center items-center space-x-1 overflow-x-auto flex-nowrap no-scrollbar">
+                <li><a href="#gemini-strategy" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-3 sm:px-4 py-2 rounded-full transition-all whitespace-nowrap">✨ Twoja Strategia</a></li>
+                <li><a href="#summary" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-3 sm:px-4 py-2 rounded-full transition-all whitespace-nowrap">Rekomendacje</a></li>
+                <li><a href="#comparison" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-3 sm:px-4 py-2 rounded-full transition-all whitespace-nowrap">Porównanie</a></li>
+                <li><a href="#analysis" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-3 sm:px-4 py-2 rounded-full transition-all whitespace-nowrap">Analiza</a></li>
+                <li><a href="#tips" class="text-sm sm:text-base text-slate-300 hover:text-white hover:bg-slate-700 font-medium px-3 sm:px-4 py-2 rounded-full transition-all whitespace-nowrap">Wskazówki</a></li>
             </ul>
         </nav>
 
@@ -474,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const color = colors[index % colors.length];
 
             return {
-                label: appData.analysis[p.id].title,
+                label: appData.analysis[p.id].title.split(' (')[0],
                 data: [p.scores.easeOfStatus, p.scores.awardValue, p.scores.benefits, p.scores.availabilityPL],
                 backgroundColor: color.bg,
                 borderColor: color.border,
@@ -536,13 +543,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parts = fullTitle.split(' (');
                 const mainName = parts[0];
                 const allianceName = `(${parts[1].replace(')', '')})`;
-                buttonHtml = `${mainName}<br><span class="text-xs text-slate-500 font-normal">${allianceName}</span>`;
+                buttonHtml = `${mainName}<br><span class="text-xs text-slate-500 font-normal group-hover:text-slate-300 transition-colors">${allianceName}</span>`;
             } else {
                 buttonHtml = fullTitle;
             }
 
             button.innerHTML = buttonHtml;
-            button.className = `tab-button text-center flex-shrink-0 border-b-2 border-transparent pb-3 px-3 text-sm font-medium text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors ${index === 0 ? 'active' : ''}`;
+            button.className = `tab-button group text-center flex-shrink-0 border-b-2 border-transparent pb-3 px-3 text-sm font-medium text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors ${index === 0 ? 'active' : ''}`;
             button.dataset.target = programId;
             tabsContainer.appendChild(button);
         });
@@ -560,8 +567,12 @@ document.addEventListener('DOMContentLoaded', () => {
         tabsContainer.addEventListener('click', (e) => {
             const button = e.target.closest('.tab-button');
             if (button) {
-                tabsContainer.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                tabsContainer.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.querySelector('span')?.classList.remove('text-slate-300');
+                });
                 button.classList.add('active');
+                button.querySelector('span')?.classList.add('text-slate-300');
                 renderTabContent(button.dataset.target);
             }
         });
